@@ -26,11 +26,9 @@
                     logIn($conn);
                 }
             ?>
-            <br>
-            <br>
-            <br>
 
-            
+            <br><br><br>
+
             <form action="" method="post">
                 <fieldset>
                     <legend>Cadastrar - Bonfire</legend>

@@ -77,10 +77,10 @@
         $sUReturn = mysqli_fetch_assoc($sUExec);
 
         return $sUReturn;
-        }
+    }
 
-        function generalQuery($conn, $table, $where = 1, $order = "")
-        {
+    function generalQuery($conn, $table, $where = 1, $order = "")
+    {
         if(!empty($order))
         {
             $order = "ORDER BY $order";
@@ -105,6 +105,7 @@
             $nickCadastro = mysqli_real_escape_string($conn,$_POST['nickCadastro']);
             $senhaCadastro = md5($_POST['senhaCadastro']);   
 
+                
                 if($_POST['senhaCadastro'] != $_POST['senhaCadastroConfirma'])
                 {
                     $err[] = "Senhas não conferem!";
@@ -168,40 +169,84 @@
         }    
     }
 
-    function updateAccount($conn, $table, $id)
+    function updateAccount($conn)
     {
-        if(isset($_POST['editar']) AND !empty($_POST['nEmail']))
+        if(isset($_POST['editar'])AND !empty($_POST['nEmail']))
         {
             $err = array();
 
-            $nEmail = filter_input(INPUT_POST, "nEmail", FILTER_VALIDATE_EMAIL);
-            $nEick = mysqli_real_escape_string($conn,$_POST['nNick']);
-            $nSenha = md5($_POST['nSenha']);   
+            $id = filter_input(INPUT_POST,"id",FILTER_VALIDATE_INT);
+            $nEmail  = filter_input(INPUT_POST,"nEmail", FILTER_VALIDATE_EMAIL); 
+            $nSenha = "";
 
-            if(empty($nEmail))
+            if(!empty($_POST['nSenha']))
             {
-                $err[] = "Preencha o novo email!"
-            }
-            if(empty($nEmail))
-            {
-                $err[] = "Preencha o novo email!"
-            }
-            if(empty($nEmail))
-            {
-                $err[] = "Preencha o novo email!"
-            }
-                if($_POST['senhaCadastro'] != $_POST['senhaCadastroConfirma'])
+                if($_POST['nSenha'] == $_POST['nSenhaConfirma'])
                 {
-                    $err[] = "Senhas não conferem!";
+                    $nSenha = md5($_POST['senha']);
+                }
+                else
+                {
+                    $err[] = "Senhas não conferem.";
+                }
+            }
+
+            if(!empty($_POST['nNome']))
+            {
+                if(strlen($_POST['nNome']) > 3)
+                {
+                    $nNome = mysqli_real_escape_string($conn,$_POST['nNome']);
+                }
+                else
+                {
+                    $err[] = "Nome muito curto. Seu nome deve ter mais que 3 caracteres.";
+                }
+            }
+
+            
+            
+            $qActual_email = "SELECT email FROM Usuario WHERE id = $id";
+            $eActual_email = mysqli_query($conn, $qActual_email);
+            $rActual_email = mysqli_fetch_assoc($eActual_email);
+
+            $qEmail = "SELECT email FROM Usuario WHERE email = '$nEmail' and  email <>". $rActual_email['email'];
+            $eEmail = mysqli_query($conn,$qEmail);
+            $rEmail = mysqli_num_rows($eEmail);
+
+            if(!empty($rEmail))
+            {
+                $err[] = "Esse email já está cadastrado!";
+            }
+
+            if(empty($err))
+            {
+                if(!empty($nSenha))
+                {
+                    $queryUp = "UPDATE Usuario SET nome = '$nNome', senha = '$nSenha' WHERE idConta =".(int) $id; 
+                }
+                else
+                {
+                    $queryUp = "UPDATE Usuario SET nome = '$nEmail' WHERE idConta =".(int) $id;
                 }
 
-                    $qEmail = "SELECT email FROM Usuario WHERE email = '$email' ";
-                    $eEmail = mysqli_query($conn,$qEmail);
-                    $vfRowNum = mysqli_num_rows($eEmail);
+                
+                $execUp = mysqli_query($conn,$queryUp);
 
-                if(!empty($vfRowNum))
+                if($execUp)
                 {
-                    $err[] = "Email já cadastrado!";
+                    echo "Atualização concluída!";
                 }
+                else
+                {
+                    echo "Erro ao atualizar perfil!";
+                }
+            }
+            else
+            {
+                foreach ($err as $e)
+                {
+                    echo "<p> $e </p>";
+                }
+            }
         }
     }
