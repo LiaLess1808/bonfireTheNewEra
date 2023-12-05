@@ -1,20 +1,20 @@
 <?php
 
-   $hostname = '162.240.17.101';
-   $username = 'projetos_nlessa';
-   $password = 'Gc&sgY74PK$}';
-   $database = 'projetos_INF2023_G10';
+    $hostname = '162.240.17.101';
+    $username = 'projetos_nlessa';
+    $password = 'Gc&sgY74PK$}';
+    $database = 'projetos_INF2023_G10';
 
-   // Create a database connection
-   $conn = mysqli_connect($hostname, $username, $password, $database);
+    // Create a database connection
+    $conn = mysqli_connect($hostname, $username, $password, $database);
 
-   // Get user input from the form
-   function logIn($conn)
-   {
-      if(isset($_POST['acessar']) AND !empty($_POST['email']) AND !empty($_POST['senha']))
-      {
-         $email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL);
-         $senha = $_POST['senha'];
+    // LOG IN AND OUT FUNCTIONS
+    function logIn($conn)
+    {
+        if(isset($_POST['acessar']) AND !empty($_POST['email']) AND !empty($_POST['senha']))
+        {
+            $email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL);
+            $senha = md5($_POST['senha']);
 
             $query = "SELECT * FROM Usuario WHERE email = '$email' AND senha = '$senha' ";
 
@@ -40,11 +40,11 @@
             {
                 echo "Usuário ou senha não encontrados!";
             }
-      }
-   }
+        }
+    }
 
-   function setPreferences($conn)
-   {
+    function setPreferences($conn)
+    {
         if($_SESSION['genero'] === "Feminino")
         {
             $_SESSION['genderId'] = "a";
@@ -57,26 +57,53 @@
         {
             $_SESSION['genderId'] = "o/a";
         }
-   }
+    }
 
-   function logOut()
-   {
-      session_start();
-      session_unset();
-      session_destroy();
-      
-      header("Location: ../app/view/logIn.php");
-   }
+    function logOut()
+    {
+        session_start();
+        session_unset();
+        session_destroy();
 
-   function signUp($conn)
-   {
+        header("Location: ../app/view/logIn.php");
+    }
+
+    // QUERY FUNCTIONS
+    function unitQuery($conn, $table, $id)
+    {
+        $sUQuery = "SELECT * FROM $table WHERE idConta =" . (int) $id;
+
+        $sUExec = mysqli_query($conn, $sUQuery);
+        $sUReturn = mysqli_fetch_assoc($sUExec);
+
+        return $sUReturn;
+        }
+
+        function generalQuery($conn, $table, $where = 1, $order = "")
+        {
+        if(!empty($order))
+        {
+            $order = "ORDER BY $order";
+        }
+
+        $gQuery = "SELECT * FROM $table WHERE $where $order ";
+
+        $gExec = mysqli_query($conn,$gQuery);
+        $gReturn = mysqli_fetch_all($gExec, MYSQLI_ASSOC);
+
+        return $gReturn;
+    }
+
+    // LOG CRUD FUNCTIONS
+    function signUp($conn)
+    {
         if(isset($_POST['cadastrar']) AND !empty($_POST['emailCadastro']) AND !empty($_POST['senhaCadastro']))
         {
             $err = array();
 
             $emailCadastro = filter_input(INPUT_POST, "emailCadastro", FILTER_VALIDATE_EMAIL);
             $nickCadastro = mysqli_real_escape_string($conn,$_POST['nickCadastro']);
-            $senhaCadastro = $_POST['senhaCadastro'];   
+            $senhaCadastro = md5($_POST['senhaCadastro']);   
 
                 if($_POST['senhaCadastro'] != $_POST['senhaCadastroConfirma'])
                 {
@@ -94,8 +121,8 @@
 
                 if(empty($err))
                 {
-                    echo $insertNewUser = "INSERT INTO Usuario (nick, email, senha) VALUES ('$nickCadastro','$emailCadastro','$senhaCadastro')";
-                    echo $executeSignUp = mysqli_query($conn, $insertNewUser);
+                    $insertNewUser = "INSERT INTO Usuario (nick, email, senha) VALUES ('$nickCadastro','$emailCadastro','$senhaCadastro')";
+                    $executeSignUp = mysqli_query($conn, $insertNewUser);
 
                     if($executeSignUp)
                     {
@@ -116,32 +143,57 @@
 
                 
         }
-   }
+    }
 
-   function deleteData($conn,$tabela,$id)
-   {
+    function deleteAccount($conn, $table, $id)
+    {
         if(!empty($id))
-        {
-            switch ($tabela)
+        {         
+            $dQuery = "DELETE FROM $table WHERE idConta = ". (int) $id;
+
+            $dExec = mysqli_query($conn, $dQuery);
+
+            if($dExec)
             {
-                case "Usuario": 
-                {
-                    $idDeleter = "";
-                    $deleterQuery = "DELETE FROM $tabela WHERE $idDeleter = ". $id;
-                    $executeDeletion = mysqli_query($conn,$deleterQuery);
-                    if($executeDeletion)
-                    {
-                        echo $tabela. "deletado com sucesso!";
-                    }
-                    else
-                    {
-                        echo "Erro ao deletar " .strtolower($tabela).".";
-                    }
-                }; 
+                session_start();
+                session_unset();
+                session_destroy();
+                
+                header("Location: ../../app/view/logIn.php");
             }
+            else
+            {
+                echo "Não foi possível deletar a conta!";
+            }
+        }    
+    }
+
+    function updateAccount($conn, $table, $id)
+    {
+        if(isset($_POST['editar']) AND !empty($_POST['nEmail']))
+        {
+            $err = array();
+
+            $nEmail = filter_input(INPUT_POST, "nEmail", FILTER_VALIDATE_EMAIL);
+            $nEick = mysqli_real_escape_string($conn,$_POST['nNick']);
+            $nSenha = md5($_POST['nSenha']);   
+
+            if(empty($nEmail))
+            {
+                $err[] = "Preencha o novo email!"
+            }
+                if($_POST['senhaCadastro'] != $_POST['senhaCadastroConfirma'])
+                {
+                    $err[] = "Senhas não conferem!";
+                }
+
+                    $qEmail = "SELECT email FROM Usuario WHERE email = '$email' ";
+                    $eEmail = mysqli_query($conn,$qEmail);
+                    $vfRowNum = mysqli_num_rows($eEmail);
+
+                if(!empty($vfRowNum))
+                {
+                    $err[] = "Email já cadastrado!";
+                }
         }
-            
-
-        
-
-   }
+    }

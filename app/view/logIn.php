@@ -45,6 +45,5 @@
             </form>
             <?php signUp($conn);?>
 
-            
         </body>
     </html>
