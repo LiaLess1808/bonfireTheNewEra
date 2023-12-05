@@ -182,6 +182,14 @@
             {
                 $err[] = "Preencha o novo email!"
             }
+            if(empty($nEmail))
+            {
+                $err[] = "Preencha o novo email!"
+            }
+            if(empty($nEmail))
+            {
+                $err[] = "Preencha o novo email!"
+            }
                 if($_POST['senhaCadastro'] != $_POST['senhaCadastroConfirma'])
                 {
                     $err[] = "Senhas não conferem!";
