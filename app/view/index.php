@@ -47,10 +47,9 @@
                 }
 
                 foreach($users as $user):
-
                     ?>
-                    <div style=" display:inline-block; flex-direction:row;">
-                        <div style="display:none;color: white;">
+                    <div style=" display:inline-block;">
+                        <div style="display:none;">
                                 <?php
                                     echo $user['idConta'];
                                 ?>
@@ -81,19 +80,12 @@
                         <h2>Editar Perfil</h2>
                         <form action="" method="post">
                             <input type="hidden" name = "editId" value = <?php echo $_GET['editId']?>>
-                            <input type="text" placeholder="Nome" name="nNome"><br><br>
-                            <input type="email" placeholder="Email" name="nEmail"><br><br>
-                            <input type="text" placeholder="Senha" name="nSenha"><br><br>
-                            <input type="text" placeholder="Confirme a senha" name="nSenhaConfirma"><br><br>
-
-                            <input type="submit" name="editar" value="Editar Perfil">
+                            <a href="index.php"><button>CANCELAR</button></a>
                         </form>
                     <?php
                 }
 
             ?>
-            <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-            <script src="js/index.js"></script>
             <?php
                 if(isset($_POST['editar']))
                 {
