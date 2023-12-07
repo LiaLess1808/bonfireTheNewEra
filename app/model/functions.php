@@ -168,18 +168,3 @@
             }
         }    
     }
-
-    function selectUpdateAccount($conn)
-    {
-        $editId = $_GET['id'];
-
-        if(isset($id))
-        {
-            
-        }
-
-    }
-    function updateAccount($conn)
-    {
-        
-    }

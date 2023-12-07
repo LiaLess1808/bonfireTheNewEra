@@ -1,0 +1,44 @@
+try
+{
+    //Definindo dir_destino
+
+        $dest_dir = "assets/";
+
+    //Verificação da existência do dir
+
+        if(!is_dir($dest_dir))
+        {
+            throw new Exception("Diretório não encontrado.");
+        }
+    
+    //Verifica se o arquivo é executavel
+
+        if(is_executable($_FILES["formFile_name"][tmp_name]))
+        {
+            throw new Exception("Arquivos executáveis não são permitidos.");
+        }
+
+    //Obtém extensão do arquivo
+    
+        $file_ext = pathinfo($_FILES["formFile_name"][name], PATHINFO_EXTENSION);
+
+    //Gera nome novo de id única
+        $unique_name = uniqid($SESSION['nick'] . "_") . $file_ext;
+
+    //Caminho novo do arquivo no server
+        $serverFile_name = $dest_dir . $unique_name;
+
+    //Movendo temp para o dir
+        if(move_uploaded_file($_FILES["formFile_name"][tmp_name], $serverFile_name))
+        {
+            echo "Arquivo enviado";
+        }
+        else
+        {
+            throw new Exception("Erro ao enviar. Erro: " . $FILES["formFile_name"]["error]);
+        }
+}
+catch(Exception $e)
+{
+    echo $e->getMessage();
+}

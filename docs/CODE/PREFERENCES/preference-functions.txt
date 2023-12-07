@@ -1,0 +1,15 @@
+function setPreferences($conn)
+{
+    if($_SESSION['genero'] === "Feminino")
+    {
+        $_SESSION['genderId'] = "a";
+    }
+    else if($_SESSION['genero'] === "Masculino")
+    {
+        $_SESSION['genderId'] = "o";
+    }
+    else
+    {
+        $_SESSION['genderId'] = "o/a";
+    }
+}

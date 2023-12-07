@@ -1,0 +1,71 @@
+function signUp($conn)
+{
+    if(isset($_POST['cadastrar']) AND !empty($_POST['emailCadastro']) AND !empty($_POST['senhaCadastro']))
+    {
+        $err = array();
+
+        $emailCadastro = filter_input(INPUT_POST, "emailCadastro", FILTER_VALIDATE_EMAIL);
+        $nickCadastro = mysqli_real_escape_string($conn,$_POST['nickCadastro']);
+        $senhaCadastro = md5($_POST['senhaCadastro']);   
+
+            
+            if($_POST['senhaCadastro'] != $_POST['senhaCadastroConfirma'])
+            {
+                $err[] = "Senhas não conferem!";
+            }
+
+                $queryEmail = "SELECT email FROM Usuario WHERE email = '$emailCadastro' ";
+                $searchEmail = mysqli_query($conn,$queryEmail);
+                $verifyRowNum = mysqli_num_rows($searchEmail);
+
+            if(!empty($verifyRowNum))
+            {
+                $err[] = "Email já cadastrado!";
+            }
+
+            if(empty($err))
+            {
+                $insertNewUser = "INSERT INTO Usuario (nick, email, senha) VALUES ('$nickCadastro','$emailCadastro','$senhaCadastro')";
+                $executeSignUp = mysqli_query($conn, $insertNewUser);
+
+                if($executeSignUp)
+                {
+                    echo "Usuário cadastrado com sucesso!";
+                }
+                else
+                {
+                    echo "Erro ao cadastrar usuário". mysqli_error($conn)."!";
+                }
+            }
+            else
+            {
+                foreach($err as $e)
+                {
+                    echo "<p> $e <p>";
+                }
+            }       
+    }
+}
+
+function deleteAccount($conn, $table, $id)
+{
+    if(!empty($id))
+    {         
+        $dQuery = "DELETE FROM $table WHERE idConta = ". (int) $id;
+
+        $dExec = mysqli_query($conn, $dQuery);
+
+        if($dExec)
+        {
+            session_start();
+            session_unset();
+            session_destroy();
+            
+            header("Location: ../../app/view/logIn.php");
+        }
+        else
+        {
+            echo "Não foi possível deletar a conta!";
+        }
+    }    
+}

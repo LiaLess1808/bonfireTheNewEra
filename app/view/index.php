@@ -1,9 +1,7 @@
 <?php 
     session_start();
     $verify = isset($_SESSION['active']) ? true : header("Location: ./logIn.php");
-    require_once "../model/functions.php";
-    require_once "../control/User.php";
-    
+    require_once "../model/functions.php";    
 ?>
 
 <!DOCTYPE html>
@@ -17,9 +15,6 @@
     </head>
         <body>
             <?php
-
-                $usuarioPadrao = new User(67,'userP','e7d80ffeefa212b7c5c55700e4f7193e', 'userP@usuariopadrao.com', 'Indefinido');
-
                 $table = "Usuario";
                 $users = generalQuery($conn, $table);
 
@@ -30,7 +25,6 @@
                     <h1>Home</h1>
                     <h3>Bem-vind<?php echo $_SESSION['genderId'] . ", " . $_SESSION['nick'] . "!"; ?></h3><br>
                     
-                    <h4>Seguindo: <?php echo $usuarioPadrao->getNick() ?></h4>
                     <a href="../../helpers/logOut.php">SAIR</a><br><br>
                     <a href="./index.php?editId=<?php echo $_SESSION['idConta']?>">EDITAR PERFIL</a>
                     <a href="./index.php?id=<?php echo $_SESSION['idConta'];?>&n=<?php echo $_SESSION['nick'];?>">EXCLUIR CONTA</a>
